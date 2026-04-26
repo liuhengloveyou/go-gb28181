@@ -15,7 +15,7 @@ type RegisterHooks interface {
 	ValidateRegister(ctx *Context) error
 	// OnUnregister 在 Expires=0 注销时执行（业务状态落库）。
 	OnUnregister(ctx *Context) error
-	// OnRegister 在成功注册时执行（业务状态落库）。
+	// OnRegister 在成功注册时执行（业务状态落库；在 SIP 200 OK 之前调用）。
 	OnRegister(ctx *Context, expires int) error
 	// AfterRegister 在成功应答后执行（可触发目录/设备信息拉取）。
 	AfterRegister(ctx *Context) error

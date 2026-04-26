@@ -87,6 +87,15 @@ func (s *Service) SendDeviceConfigSnapShot(ep DeviceEndpoint, channelOrDeviceID 
 	return s.SendMessage(ep, body)
 }
 
+// SendDeviceControlPTZ 发送云台方向控制（Control CmdType=DeviceControl, PTZCmd）。
+func (s *Service) SendDeviceControlPTZ(ep DeviceEndpoint, channelOrDeviceID string, action PTZAction, speed int) (*Transaction, error) {
+	body, err := BuildDeviceControlPTZXML(channelOrDeviceID, action, speed)
+	if err != nil {
+		return nil, err
+	}
+	return s.SendMessage(ep, body)
+}
+
 func sendMessage(srv *Server, platform *Address, ep DeviceEndpoint, body []byte) (*Transaction, error) {
 	if srv == nil || platform == nil {
 		return nil, fmt.Errorf("gb28181/sdk: nil server or platform")

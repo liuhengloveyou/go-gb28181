@@ -203,6 +203,27 @@ func (r *Runtime) WrapRequest(t platform.DialogueTarget, method string, contentT
 	return platform.OutboundRequest(r.svc.Server, r.platform, t, method, contentType, body, opts...)
 }
 
+// PTZControl 使用 Runtime 已登记的设备 Endpoint 下发云台方向控制。
+func (r *Runtime) PTZControl(deviceID, channelOrDeviceID string, action PTZAction, speed int) (*Transaction, error) {
+	if r == nil || r.svc == nil || r.svc.Server == nil {
+		return nil, fmt.Errorf("runtime not ready")
+	}
+	st, ok := r.LoadSession(deviceID)
+	if !ok || st == nil || !st.IsOnline {
+		return nil, fmt.Errorf("device offline")
+	}
+	ep, ok := r.LoadPeer(deviceID)
+	if !ok || ep == nil {
+		return nil, fmt.Errorf("device endpoint not found")
+	}
+	body, err := BuildDeviceControlPTZXML(channelOrDeviceID, action, speed)
+	if err != nil {
+		return nil, err
+	}
+	ct := ContentTypeXML
+	return r.WrapRequest(ep, MethodMessage, &ct, body)
+}
+
 func (r *Runtime) NewChannelTarget(deviceID, domain, channelID string) (*platform.ChannelTarget, bool) {
 	ep, ok := r.peers.Load(deviceID)
 	if !ok || ep == nil {
